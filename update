@@ -1,0 +1,37 @@
+<?php
+// Include necessary files
+include_once 'config/Database.php';
+include_once 'classes/User.php';
+
+// Instantiate database and user objects
+$database = new Database();
+$db = $database->getConnection();
+
+$user = new User($db);
+
+$user->id = isset($_GET['id']) ? $_GET['id'] : die('ERROR: missing ID.');
+
+if($_POST) {
+    $user->name = $_POST['name'];
+    $user->email = $_POST['email'];
+
+    if($user->update()) {
+        echo "User was updated.";
+    } else {
+        echo "Unable to update user.";
+    }
+}
+
+// Fetch user data for editing
+$stmt = $db->prepare("SELECT * FROM users WHERE id = ?");
+$stmt->execute([$user->id]);
+$row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+?>
+
+<form action="update.php?id=<?php echo $user->id; ?>" method="post">
+    <p>Name: <input type="text" name="name" value="<?php echo $row['name']; ?>" required></p>
+    <p>Email: <input type="email" name="email" value="<?php echo $row['email']; ?>" required></p>
+    <input type="submit" value="Update User">
+</form>
+<a href="index.php">Back to Users</a>

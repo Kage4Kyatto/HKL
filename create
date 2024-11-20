@@ -1,0 +1,29 @@
+<?php
+// Include necessary files
+include_once 'config/Database.php';
+include_once 'classes/User.php';
+
+// Instantiate database and user objects
+$database = new Database();
+$db = $database->getConnection();
+
+$user = new User($db);
+
+if($_POST) {
+    $user->name = $_POST['name'];
+    $user->email = $_POST['email'];
+
+    if($user->create()) {
+        echo "User was created.";
+    } else {
+        echo "Unable to create user.";
+    }
+}
+?>
+
+<form action="create.php" method="post">
+    <p>Name: <input type="text" name="name" required></p>
+    <p>Email: <input type="email" name="email" required></p>
+    <input type="submit" value="Create User">
+</form>
+<a href="index.php">Back to Users</a>
